@@ -12,8 +12,8 @@ email, and gets back:
   exact opt-out page, the clicks that follow, copy buttons for your details, a status tracker and
   calendar reminders,
 - statutorily-worded removal emails per region,
-- ready-made searches for mentions of their name, username and email, plus image, archive, code and
-  breach-check links.
+- ready-made searches for mentions of their name, username and email, plus image, archive, code,
+  gaming-platform and breach-check links.
 
 It is built for teaching opsec: run it, fix what it finds, run it again.
 
@@ -26,8 +26,10 @@ It is built for teaching opsec: run it, fix what it finds, run it again.
 - **~40 manual self-check links** for sites that block automation or need an ID you would have to
   paste — X, Instagram, TikTok, Facebook, LinkedIn, Threads, marketplaces, fitness apps, payment
   handles and more.
-- **~40 prepared searches**, grouped into username, name, email, code/pastes, images, archives and
-  breach checks. You run them yourself; nothing is scraped.
+- **~50 prepared searches**, grouped into username, gaming platforms, name, name-by-platform,
+  email, code/pastes, images, archives and breach checks. You run them yourself; nothing is scraped.
+  Each query row also has a **First result** link (Google's “I'm Feeling Lucky” or DuckDuckGo's
+  `!ducky`) that jumps straight to the top hit.
 - **Gravatar** lookup for each email address.
 
 Some sites answer every request with a bot challenge. Those are reported as **blocked**, never as
@@ -44,6 +46,35 @@ Some sites answer every request with a bot challenge. Those are reported as **bl
 - No storage. Jobs live in memory and are wiped on request or after 10 minutes.
 
 Sites that block automation are offered as self-check links rather than fake "not found" results.
+
+---
+
+## How the search links work
+
+The report ends with pre-filled searches, grouped so you can do the useful ones first:
+
+| Group | What it covers |
+|---|---|
+| Username | The exact handle, common variations, and `site:` sweeps of social, marketplaces, forums, pastes and documents |
+| Gaming platforms | Direct player search on Steam, Roblox, Xbox, Minecraft/NameMC, Chess.com, itch.io and BoardGameGeek, plus `site:` sweeps of launchers, consoles, esports, speedruns, mods, trackers and streaming |
+| Your name | Your name alone, with your town, in documents, CVs and data-broker pages |
+| Find your profile by name | One row each for Facebook, Instagram, LinkedIn, X, TikTok and Threads, narrowed by your town |
+| Email | Each address in search, text/CSV files and paste sites |
+| Code & pastes | grep.app, searchcode, Sourcegraph, Pastebin |
+| Images | Google, Bing and Yandex image search, Have I Been Trained, TinEye |
+| Archives | Wayback and archive.today copies of profiles found in the scan |
+| Breach checks | HaveIBeenPwned, Firefox Monitor, LeakCheck |
+
+Every query row has a **First result** link: Google's “I'm Feeling Lucky” (`&btnI=1`) or
+DuckDuckGo's `!ducky` bang. It asks *your browser* to jump to the top hit, so the server still never
+reads a search engine. If the interstitial appears, the normal Google, Bing and DuckDuckGo links sit
+next to it.
+
+Gaming platforms are handled in two ways on purpose. Where a site exposes a public player search
+(Steam, Roblox, Xbox, NameMC and friends) the row opens that search directly. Where it does not
+(Epic, Battle.net, Riot, Nintendo and the rest) it falls back to a `site:` query. Platforms that were
+already probed automatically are labelled as such — the search row is for mentions, not for a second
+existence check.
 
 ---
 

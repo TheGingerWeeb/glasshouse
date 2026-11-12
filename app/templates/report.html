@@ -288,7 +288,11 @@
   <div class="panel">
     <p class="small" style="margin-top:0">
       Run these yourself. They're pre-filled searches and links — no engine is scraped on your behalf.
-      Start with <strong>Username</strong> and <strong>Email</strong>; the rest is worth doing once.
+      Start with <strong>Username</strong> and <strong>Gaming platforms</strong>, then
+      <strong>Find your profile by name</strong> and <strong>Email</strong>.
+      <br>
+      <strong>First result</strong> uses Google's “I'm Feeling Lucky” button, so it jumps straight to
+      the top hit. If it shows an interstitial, use the normal Google or DuckDuckGo links instead.
     </p>
     {% for group in summary.link_groups %}
       <h3>{{ group.label }}</h3>
@@ -313,7 +317,10 @@
                 {% else %}
                   <a href="{{ row.google }}" target="_blank" rel="noopener noreferrer nofollow">Google</a> ·
                   <a href="{{ row.bing }}" target="_blank" rel="noopener noreferrer nofollow">Bing</a> ·
-                  <a href="{{ row.ddg }}" target="_blank" rel="noopener noreferrer nofollow">DuckDuckGo</a>
+                  <a href="{{ row.ddg }}" target="_blank" rel="noopener noreferrer nofollow">DuckDuckGo</a><br>
+                  <a href="{{ row.google_first }}" target="_blank" rel="noopener noreferrer nofollow"><strong>First result</strong></a>
+                  <span class="small">or</span>
+                  <a href="{{ row.ddg_first }}" target="_blank" rel="noopener noreferrer nofollow">DuckDuckGo</a>
                 {% endif %}
               </td>
             </tr>

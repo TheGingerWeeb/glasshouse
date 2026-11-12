@@ -23,6 +23,15 @@ ENGINES = {
     "ddg": "https://duckduckgo.com/?q={q}",
 }
 
+# "First result" shortcuts. Both are ordinary links -- the browser asks the
+# search engine to jump to the top hit, so nothing is read on the server.
+FIRST_RESULT = {
+    # Google's "I'm Feeling Lucky" button.
+    "google": "https://www.google.com/search?q={q}&btnI=1",
+    # DuckDuckGo's !ducky bang does the same thing.
+    "ddg": "https://duckduckgo.com/?q=!ducky+{q}",
+}
+
 ARCHIVE_LIMIT = 4
 
 
@@ -37,6 +46,8 @@ def _query_row(group: str, label: str, note: str, query: str) -> dict:
         "google": ENGINES["google"].format(q=q),
         "bing": ENGINES["bing"].format(q=q),
         "ddg": ENGINES["ddg"].format(q=q),
+        "google_first": FIRST_RESULT["google"].format(q=q),
+        "ddg_first": FIRST_RESULT["ddg"].format(q=q),
     }
 
 
@@ -117,6 +128,120 @@ def build(profile: dict, found_sites: list[dict]) -> list[dict]:
             f'"{username}" (filetype:pdf OR filetype:docx OR filetype:xlsx OR filetype:csv)',
         ))
 
+    # ------------------------------------------------------------------ gaming
+    if username:
+        q = quote_plus(username)
+        group = "Gaming platforms"
+        rows.append(_query_row(
+            group,
+            "Username on gaming platforms",
+            "A wide sweep of the platforms that keep public player pages.",
+            f'"{username}" (site:steamcommunity.com OR site:roblox.com OR site:epicgames.com '
+            f'OR site:battle.net OR site:faceit.com OR site:twitch.tv)',
+        ))
+
+        # Direct links to each platform's own player search, where it exists.
+        rows.append(_direct_row(
+            group,
+            "Steam: player search",
+            "Steam shows vanity names and old aliases. Already probed above; "
+            "use this to find mentions and comments.",
+            f"https://steamcommunity.com/search/users/?text={q}",
+        ))
+        rows.append(_direct_row(
+            group,
+            "Roblox: user search",
+            "Roblox has its own user search. Already probed above for the exact name.",
+            f"https://www.roblox.com/search/users?keyword={q}",
+        ))
+        rows.append(_direct_row(
+            group,
+            "Xbox: profile search",
+            "Gamertags differ from your handle, so try common variations too.",
+            f"https://www.xbox.com/en-US/search?q={q}",
+        ))
+        rows.append(_direct_row(
+            group,
+            "Minecraft: NameMC search",
+            "NameMC also shows previous names and skins for a Minecraft account.",
+            f"https://namemc.com/search?q={q}",
+        ))
+        rows.append(_direct_row(
+            group,
+            "Chess.com: search",
+            "Already probed above. This finds clubs, games and forum posts too.",
+            f"https://www.chess.com/search?q={q}",
+        ))
+        rows.append(_direct_row(
+            group,
+            "itch.io: search",
+            "Already probed as a subdomain. This finds comments and collections.",
+            f"https://itch.io/search?q={q}",
+        ))
+        rows.append(_direct_row(
+            group,
+            "BoardGameGeek: user search",
+            "Profiles often list a real name and a town.",
+            f"https://boardgamegeek.com/geeksearch.php?action=search&q={q}&objecttype=user",
+        ))
+
+        # Platforms with no stable public search page get a site: query.
+        rows.append(_query_row(
+            group,
+            "PC launchers and stores",
+            "Epic, GOG, Battle.net, EA and Ubisoft pages are indexed by search engines.",
+            f'"{username}" (site:epicgames.com OR site:gog.com OR site:battle.net '
+            f'OR site:ea.com OR site:ubisoft.com)',
+        ))
+        rows.append(_query_row(
+            group,
+            "Console profiles",
+            "PlayStation, Nintendo and Xbox pages, including trophy and achievement sites.",
+            f'"{username}" (site:playstation.com OR site:nintendo.com OR site:xbox.com '
+            f'OR site:psnprofiles.com OR site:trueachievements.com)',
+        ))
+        rows.append(_query_row(
+            group,
+            "Competitive and esports",
+            "FACEIT, Riot, and the big stat trackers for CS, Valorant, Apex and Overwatch.",
+            f'"{username}" (site:faceit.com OR site:riotgames.com OR site:op.gg '
+            f'OR site:tracker.gg OR site:overbuff.com OR site:r6.tracker.network)',
+        ))
+        rows.append(_query_row(
+            group,
+            "Speedruns and retro achievements",
+            "Leaderboards are public and often keep a country or region.",
+            f'"{username}" (site:speedrun.com OR site:retroachievements.org)',
+        ))
+        rows.append(_query_row(
+            group,
+            "Mods, indie games and game jams",
+            "Comment sections and project credits are easy to forget.",
+            f'"{username}" (site:moddb.com OR site:nexusmods.com OR site:gamejolt.com '
+            f'OR site:itch.io)',
+        ))
+        rows.append(_query_row(
+            group,
+            "Gaming forums and communities",
+            "Old posts often carry your real name, town or email in a quote.",
+            f'"{username}" (site:reddit.com/r/gaming OR site:neogaf.com '
+            f'OR site:resetera.com OR site:gamespot.com OR site:ign.com)',
+        ))
+        rows.append(_query_row(
+            group,
+            "Game trackers and backlogs",
+            "Backlog and stats sites record what you played and when.",
+            f'"{username}" (site:backloggd.com OR site:howlongtobeat.com '
+            f'OR site:steamdb.info OR site:steamcharts.com)',
+        ))
+        rows.append(_query_row(
+            group,
+            "Streaming and Discord",
+            "Twitch pages are public; Discord profiles are numeric IDs, so this only "
+            "finds servers and posts that mention the name.",
+            f'"{username}" (site:twitch.tv OR site:discord.com OR site:youtube.com)',
+        ))
+
     # ------------------------------------------------------------ code & pastes
     if username:
         q = quote_plus(username)
@@ -168,12 +293,6 @@ def build(profile: dict, found_sites: list[dict]) -> list[dict]:
         ))
         rows.append(_query_row(
             "Your name",
-            "Your name on social platforms",
-            "A quick sweep of the usual suspects.",
-            f'"{name}" (site:facebook.com OR site:instagram.com OR site:linkedin.com OR site:x.com)',
-        ))
-        rows.append(_query_row(
-            "Your name",
             "Your name in documents",
             "Published PDFs, council papers and conference programmes.",
             f'"{name}" (filetype:pdf OR filetype:docx)',
@@ -190,6 +309,58 @@ def build(profile: dict, found_sites: list[dict]) -> list[dict]:
             "Useful before working through the guided removal queue below.",
             f'"{name}" (site:spokeo.com OR site:whitepages.com OR site:intelius.com OR site:beenverified.com OR site:peoplefinder.com)',
         ))
+
+    # ------------------------------------------------------- name by platform
+    if name:
+        group = "Find your profile by name"
+        where = f' "{city}"' if city else ""
+        rows.append(_query_row(
+            group,
+            "All the big social platforms",
+            "The same name search across Facebook, Instagram, LinkedIn, X, TikTok and Threads.",
+            f'"{name}"{where} (site:facebook.com OR site:instagram.com OR site:linkedin.com '
+            f'OR site:x.com OR site:tiktok.com OR site:threads.net)',
+        ))
+
+        platforms = [
+            (
+                "Facebook",
+                "facebook.com",
+                "Facebook shows a login wall to scripts. Use First result, then open the About tab.",
+            ),
+            (
+                "Instagram",
+                "instagram.com",
+                "Public profiles stay in the search index even when the site asks you to log in.",
+            ),
+            (
+                "LinkedIn",
+                "linkedin.com",
+                "Public profiles are indexed. Add your employer if the name is common.",
+            ),
+            (
+                "X (Twitter)",
+                "x.com",
+                "X renders profiles with JavaScript. The index keeps older public posts.",
+            ),
+            (
+                "TikTok",
+                "tiktok.com",
+                "Profile pages are indexed with both the handle and the display name.",
+            ),
+            (
+                "Threads",
+                "threads.net",
+                "Try the name with and without the @, and with your town if it is common.",
+            ),
+        ]
+        for label, host, note in platforms:
+            rows.append(_query_row(
+                group,
+                f"Your name on {label}",
+                f"{note} First result jumps straight to the top hit.",
+                f'"{name}"{where} site:{host}',
+            ))
 
     # ------------------------------------------------------------------ email
     for email in emails:
