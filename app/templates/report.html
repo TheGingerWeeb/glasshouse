@@ -1,0 +1,403 @@
+{% extends "base.html" %}
+{% block title %}Your footprint — Glasshouse{% endblock %}
+{% block content %}
+<h1>Your footprint report</h1>
+<p class="lede">
+  {% if job.profile.username %}Username <code>{{ job.profile.username }}</code>{% endif %}
+  {% if job.profile.emails %} · {{ job.profile.emails | length }} email{{ 's' if job.profile.emails | length != 1 }}{% endif %}
+  {% if job.profile.name %} · {{ job.profile.name }}{% endif %}
+  {% if job.profile.city %} · {{ job.profile.city }}{% endif %}
+</p>
+
+{% if summary.imported %}
+  <div class="notice good">
+    This is a restored plan. Your ticks, notes and follow-up dates are back. Run a fresh scan if you want to
+    re-check the sites rather than the plan.
+  </div>
+{% endif %}
+
+<div class="notice">
+  Checked <strong>{{ summary.coverage.scanned }}</strong> automated sources:
+  <strong>{{ summary.coverage.found }}</strong> public profiles found,
+  {{ summary.coverage.ambiguous }} unclear,
+  {{ summary.coverage.blocked }} refused or unreachable.
+  <br><span class="small">Not found ≠ safe. These are only the sources on the list, and private accounts are invisible.</span>
+</div>
+
+<div class="cards">
+  {% for card in summary.cards %}
+    <div class="card {{ card.tone }}">
+      <div class="label">{{ card.label }}</div>
+      <h3>{{ card.title }}</h3>
+      <p class="why">{{ card.why }}</p>
+      <p class="fix"><strong>Fix:</strong> {{ card.fix }}</p>
+    </div>
+  {% endfor %}
+</div>
+
+{% if summary.groups %}
+  <h2>Public accounts using this username</h2>
+  {% for group in summary.groups %}
+    <div class="panel">
+      <h3>{{ group.label }}</h3>
+      <ul class="plain">
+        {% for item in group.entries %}
+          <li class="account">
+            <a href="{{ item.url }}" target="_blank" rel="noopener noreferrer nofollow">{{ item.name }}</a>
+            <span class="badge">{{ 'verified' if item.confidence == 'high' else 'confirm' }}</span>
+            {% if item.note %}<span class="small">{{ item.note }}</span>{% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endfor %}
+{% endif %}
+
+{% if summary.manual %}
+  <h2>Check these yourself</h2>
+  <div class="panel">
+    <p class="small" style="margin-top:0">These sites block automated lookups. Open each link in a private window, logged out.</p>
+    <ul class="plain">
+      {% for item in summary.manual %}
+        <li class="account">
+          <a href="{{ item.url }}" target="_blank" rel="noopener noreferrer nofollow">{{ item.name }}</a>
+          <span class="small">{{ item.why }}</span>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endif %}
+
+<details class="panel" id="details-card" open>
+  <summary>
+    <strong>Your details for the removal forms</strong>
+    <span class="small">— kept in this browser only, never sent to our server</span>
+  </summary>
+  <p class="small">
+    Fill this once. The copy buttons below and in every broker card read from here, so you never retype
+    your address into three different forms.
+  </p>
+  <div class="row">
+    <label class="field">
+      <span class="name">Full name</span>
+      <input type="text" data-detail="name" value="{{ job.profile.name }}" autocomplete="name">
+    </label>
+    <label class="field">
+      <span class="name">Email</span>
+      <input type="text" data-detail="email" value="{{ job.profile.emails[0] if job.profile.emails else '' }}" autocomplete="email">
+    </label>
+  </div>
+  <div class="row">
+    <label class="field">
+      <span class="name">Street address</span>
+      <input type="text" data-detail="address" autocomplete="street-address">
+    </label>
+    <label class="field">
+      <span class="name">City</span>
+      <input type="text" data-detail="city" value="{{ job.profile.city }}" autocomplete="address-level2">
+    </label>
+    <label class="field">
+      <span class="name">Postcode / ZIP</span>
+      <input type="text" data-detail="postcode" autocomplete="postal-code">
+    </label>
+  </div>
+  <div class="row">
+    <label class="field">
+      <span class="name">Phone <span class="small">(only when a form demands it)</span></span>
+      <input type="text" data-detail="phone" autocomplete="tel">
+    </label>
+    <label class="field">
+      <span class="name">Date of birth <span class="small">(only when a form demands it)</span></span>
+      <input type="text" data-detail="dob" placeholder="YYYY-MM-DD">
+    </label>
+  </div>
+</details>
+
+<h2 id="cleanup">Cleanup plan</h2>
+<div class="panel">
+  <p style="margin-top:0">
+    <strong>{{ summary.done_items }} of {{ summary.total_items }}</strong> steps done.
+  </p>
+  {% set pct = (100 * summary.done_items / summary.total_items) | round | int if summary.total_items else 0 %}
+  <div class="bar"><span style="width: {{ pct }}%"></span></div>
+
+  <h3>Start here (works for everyone)</h3>
+  {% for item in summary.general %}
+    <form method="post" action="/scan/{{ job.id }}/track" class="check-row {{ 'done' if item.done }}">
+      <input type="hidden" name="item" value="{{ item.key }}">
+      <input type="checkbox" name="done" value="1" onchange="this.form.submit()" {{ 'checked' if item.done }}>
+      <div class="body">
+        <strong>{{ item.label }}</strong>
+        <small>{{ item.note }}</small>
+        {% if item.link %}<small><a href="{{ item.link }}" target="_blank" rel="noopener noreferrer nofollow">{{ item.link_label }}</a></small>{% endif %}
+      </div>
+      <noscript><button class="ghost" type="submit">Save</button></noscript>
+    </form>
+  {% endfor %}
+
+  {% if summary.account_items %}
+    <h3>Accounts to keep, lock down or delete</h3>
+    {% for item in summary.account_items %}
+      <form method="post" action="/scan/{{ job.id }}/track" class="check-row {{ 'done' if item.done }}">
+        <input type="hidden" name="item" value="{{ item.key }}">
+        <input type="checkbox" name="done" value="1" onchange="this.form.submit()" {{ 'checked' if item.done }}>
+        <div class="body">
+          <strong>{{ item.label }}</strong>
+          <small><a href="{{ item.link }}" target="_blank" rel="noopener noreferrer nofollow">{{ item.link }}</a></small>
+        </div>
+        <noscript><button class="ghost" type="submit">Save</button></noscript>
+      </form>
+    {% endfor %}
+  {% endif %}
+</div>
+
+<h2 id="brokers">Data brokers — guided removal</h2>
+<div class="panel">
+  <p style="margin-top:0">
+    Each card opens the exact opt-out page and tells you the three clicks that follow. One broker at a
+    time: open it, copy your details, mark it done, and the next one appears.
+  </p>
+
+  <form method="post" action="/scan/{{ job.id }}/regions" class="checks" style="margin-bottom:14px">
+    {% for code, label in regions %}
+      <label>
+        <input type="checkbox" name="regions" value="{{ code }}" onchange="this.form.submit()" {{ 'checked' if code in job.regions }}>
+        {{ label }}
+      </label>
+    {% endfor %}
+    <noscript><button class="ghost" type="submit">Update</button></noscript>
+  </form>
+
+  <div class="queue-head">
+    <div style="flex:1">
+      <strong id="broker-count">{{ summary.broker_done }} of {{ summary.broker_total }} brokers done</strong>
+      {% set bpct = (100 * summary.broker_done / summary.broker_total) | round | int if summary.broker_total else 0 %}
+      <div class="bar"><span id="broker-bar" style="width: {{ bpct }}%"></span></div>
+    </div>
+    <label class="toggle"><input type="checkbox" id="show-all"> Show every broker</label>
+  </div>
+
+  <div id="broker-queue">
+    {% for group in summary.broker_groups %}
+      <div data-region-block>
+        <h3>{{ group.label }}</h3>
+        {% for item in group.entries %}
+          <div class="broker-card" data-broker-card data-state="{{ item.state }}" id="{{ item.key | replace(':', '-') }}">
+            <div class="broker-top">
+              <strong>{{ item.label }}</strong>
+              <span class="badge">⏱ ~{{ item.minutes }} min</span>
+              {% for req in item.requires %}<span class="badge warn">{{ req }}</span>{% endfor %}
+              {% if item.status == 'ok' %}
+                <span class="badge good">link checked {{ item.verified }}</span>
+              {% elif item.status == 'blocked' %}
+                <span class="badge">link valid · site blocks bots</span>
+              {% elif item.status == 'broken' %}
+                <span class="badge warn">page moved · use the finder</span>
+              {% else %}
+                <span class="badge">not the exact form · use the finder</span>
+              {% endif %}
+            </div>
+
+            {% if item.note %}<p class="small">{{ item.note }}</p>{% endif %}
+
+            <a class="btn wide" href="{{ item.url }}" target="_blank" rel="noopener noreferrer nofollow">
+              Open the exact opt-out page →
+            </a>
+
+            <ol class="steps">
+              {% for step in item.steps %}<li>{{ step }}</li>{% endfor %}
+            </ol>
+
+            <div class="copy-row">
+              <button type="button" class="ghost" data-copy="name">Copy name</button>
+              <button type="button" class="ghost" data-copy="email">Copy email</button>
+              <button type="button" class="ghost" data-copy="address">Copy address</button>
+            </div>
+
+            <form method="post" action="/scan/{{ job.id }}/broker" data-broker-form>
+              <input type="hidden" name="key" value="{{ item.key }}">
+              <input type="hidden" name="recheck" value="{{ item.recheck_days }}">
+              <div class="actions">
+                <button type="submit" name="state" value="submitted" data-state="submitted">Mark submitted ✓</button>
+                <button type="submit" name="state" value="removed" data-state="removed" class="ghost">Already removed</button>
+                <button type="submit" name="state" value="refused" data-state="refused" class="ghost">Couldn't do it</button>
+              </div>
+              <details>
+                <summary>Add a date, reference number or note</summary>
+                <div class="row">
+                  <label class="field">
+                    <span class="name">Submitted on</span>
+                    <input type="date" name="submitted" value="{{ item.submitted }}">
+                  </label>
+                  <label class="field">
+                    <span class="name">Their reference</span>
+                    <input type="text" name="notes" maxlength="200" value="{{ item.notes }}">
+                  </label>
+                </div>
+              </details>
+            </form>
+
+            <p class="small">
+              <a href="{{ item.fallback }}" target="_blank" rel="noopener noreferrer nofollow">Page looks wrong? Find it on the site</a>
+              {% if item.follow_up %} · follow up on {{ item.follow_up }}{% endif %}
+            </p>
+
+            {% if item.state != 'todo' %}
+              <div class="notice {{ 'good' if item.state in ['submitted', 'waiting', 'removed'] else 'warn' }}" style="margin-bottom:0">
+                Marked <strong>{{ item.state_label }}</strong>{% if item.submitted %} on {{ item.submitted }}{% endif %}{% if item.notes %} · {{ item.notes }}{% endif %}
+              </div>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    {% endfor %}
+  </div>
+
+  {% for group in summary.broker_groups %}
+    <details>
+      <summary>Removal email template — {{ group.label }} ({{ group.law }})</summary>
+      <p class="small">Use this when a site has no form, or ignores the form.</p>
+      <p class="small"><strong>Subject:</strong> {{ group.letter.subject }}</p>
+      <pre class="letter" id="letter-{{ group.code }}">{{ group.letter.body }}</pre>
+      <button class="ghost" type="button" id="letter-{{ group.code }}-btn" onclick="copyText('letter-{{ group.code }}')">Copy</button>
+    </details>
+  {% endfor %}
+</div>
+
+{% if summary.followups %}
+  <h2 id="followups">Follow-ups</h2>
+  <div class="panel">
+    <p style="margin-top:0" class="small">Brokers re-list. These dates are when to check again.</p>
+    <ul class="plain">
+      {% for item in summary.followups %}
+        <li class="account">
+          <strong>{{ item.label }}</strong>
+          <span class="badge {{ 'warn' if item.due }}">{{ 'due now' if item.due else item.date }}</span>
+          <span class="small">{{ item.region }} · <a href="{{ item.url }}" target="_blank" rel="noopener noreferrer nofollow">open</a></span>
+        </li>
+      {% endfor %}
+    </ul>
+    <p style="margin-bottom:0">
+      <a class="btn ghost" href="/scan/{{ job.id }}/reminders.ics">Add these dates to my calendar (.ics)</a>
+    </p>
+  </div>
+{% endif %}
+
+{% if summary.links %}
+  <h2>Search for mentions of you</h2>
+  <div class="panel">
+    <p class="small" style="margin-top:0">
+      Run these yourself. They're plain search queries — no engine is scraped on your behalf.
+    </p>
+    <table class="links">
+      <thead>
+        <tr><th>What it finds</th><th>Query</th><th>Run it</th></tr>
+      </thead>
+      <tbody>
+        {% for row in summary.links %}
+          <tr>
+            <td><strong>{{ row.label }}</strong><br><span class="small">{{ row.note }}</span></td>
+            <td><code>{{ row.query }}</code></td>
+            <td class="small">
+              <a href="{{ row.google }}" target="_blank" rel="noopener noreferrer nofollow">Google</a> ·
+              <a href="{{ row.bing }}" target="_blank" rel="noopener noreferrer nofollow">Bing</a> ·
+              <a href="{{ row.ddg }}" target="_blank" rel="noopener noreferrer nofollow">DuckDuckGo</a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endif %}
+
+{% if summary.emails %}
+  <h2>Your email addresses</h2>
+  <div class="panel">
+    <ul class="plain">
+      {% for item in summary.emails %}
+        <li class="account">
+          <strong>{{ item.email }}</strong>
+          {% if item.gravatar == 'found' %}
+            <span class="badge" style="color:#d29922;border-color:#d29922">public Gravatar</span>
+            <span class="small">A public profile and possibly a photo are attached to this address. <a href="{{ item.gravatar_url }}" target="_blank" rel="noopener noreferrer nofollow">View it</a>.</span>
+          {% elif item.gravatar == 'absent' %}
+            <span class="badge" style="color:#3fb950;border-color:#3fb950">no Gravatar</span>
+            <span class="small">Nothing is published via Gravatar for this address.</span>
+          {% else %}
+            <span class="badge">unchecked</span>
+            <span class="small">Gravatar couldn't be reached.</span>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+    <div class="notice" style="margin-bottom:0">
+      <strong>Breach check is a manual step.</strong> Free tools can't query breach databases automatically.
+      Open <a href="https://haveibeenpwned.com/" target="_blank" rel="noopener noreferrer nofollow">HaveIBeenPwned</a>,
+      paste your email, and change any password you've reused. That single habit matters more than everything else on this page.
+    </div>
+  </div>
+{% endif %}
+
+{% if summary.ambiguous or summary.blocked %}
+  <h2>What the tool couldn't confirm</h2>
+  <div class="panel">
+    {% if summary.ambiguous %}
+      <h3>Unclear</h3>
+      <ul class="plain">
+        {% for item in summary.ambiguous %}
+          <li class="account">
+            <a href="{{ item.url }}" target="_blank" rel="noopener noreferrer nofollow">{{ item.name }}</a>
+            <span class="small">{{ item.note or 'The page responded, but the profile could not be confirmed.' }}</span>
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+    {% if summary.blocked %}
+      <h3>Refused or unreachable</h3>
+      <ul class="plain">
+        {% for item in summary.blocked %}
+          <li class="account">
+            <a href="{{ item.url }}" target="_blank" rel="noopener noreferrer nofollow">{{ item.name }}</a>
+            <span class="small">{{ item.note or 'The site did not answer.' }}</span>
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </div>
+{% endif %}
+
+<h2>Removing pages from search results</h2>
+<div class="panel">
+  <ul class="plain">
+    {% for item in summary.earlier_steps %}
+      <li class="account">
+        <a href="{{ item.url }}" target="_blank" rel="noopener noreferrer nofollow">{{ item.label }}</a>
+        <span class="small">{{ item.note }}</span>
+      </li>
+    {% endfor %}
+  </ul>
+</div>
+
+<div class="notice warn">
+  Deleting an account doesn't delete the data. Breach dumps never forget, archives keep copies, and brokers
+  re-list after a while. The durable fixes are unique passwords, passkeys, and not reusing one handle everywhere.
+</div>
+
+<div class="toolbar no-print">
+  <button class="ghost" type="button" onclick="window.print()">Print / save as PDF</button>
+  <button class="ghost" type="button" id="export-plan">Download my plan (.json)</button>
+  <form method="post" action="/scan/{{ job.id }}/wipe" onsubmit="return confirm('Delete this report and everything it found?')">
+    <button class="ghost" type="submit">Delete my results now</button>
+  </form>
+  <a class="small" href="/">Start a new scan</a>
+</div>
+
+<script type="application/json" id="plan-data">{{ summary.export | tojson }}</script>
+
+<div class="sticky-copy no-print">
+  <span class="small">Copy for the form:</span>
+  <button type="button" class="ghost" data-copy="name">Name</button>
+  <button type="button" class="ghost" data-copy="email">Email</button>
+  <button type="button" class="ghost" data-copy="address">Address</button>
+</div>
+{% endblock %}

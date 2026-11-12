@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: glasshouse
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT --no-access-log
+    healthCheckPath: /healthz
+    envVars:
+      - key: GLASSHOUSE_COOLDOWN
+        value: "180"
+      - key: GLASSHOUSE_TTL
+        value: "600"
+      - key: GLASSHOUSE_MAX_SCANS
+        value: "5"
+      - key: GLASSHOUSE_CONCURRENCY
+        value: "10"

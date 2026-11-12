@@ -1,0 +1,642 @@
+{
+  "version": 2,
+  "note": "Deep opt-out links, verified by scripts/verify_links.py. 'verified' is the date the link last answered successfully. failed links are marked verified: null and the UI falls back to a site-scoped search.",
+  "regions": {
+    "US": {
+      "label": "United States",
+      "law": "the CCPA/CPRA and applicable state privacy laws",
+      "brokers": [
+        {
+          "id": "spokeo",
+          "name": "Spokeo",
+          "optout_url": "https://www.spokeo.com/optout",
+          "requires": [
+            "CAPTCHA",
+            "email confirm"
+          ],
+          "minutes": 3,
+          "steps": [
+            "Search your name and city",
+            "Open your record and click 'Remove this record'",
+            "Enter your email and click the link they send"
+          ],
+          "notes": "Removal is usually same-day.",
+          "recheck_days": 90,
+          "verified": "2026-11-12",
+          "status": "ok"
+        },
+        {
+          "id": "whitepages",
+          "name": "Whitepages",
+          "optout_url": "https://www.whitepages.com/suppression-requests",
+          "requires": [
+            "phone verification"
+          ],
+          "minutes": 5,
+          "steps": [
+            "Search your name and location",
+            "Copy the URL of your listing",
+            "Paste it into the suppression form, then confirm the automated phone call"
+          ],
+          "notes": "You must be able to answer a call on the number listed.",
+          "recheck_days": 90,
+          "verified": null,
+          "status": "blocked"
+        },
+        {
+          "id": "beenverified",
+          "name": "BeenVerified",
+          "optout_url": "https://www.beenverified.com/app/optout/search",
+          "requires": [
+            "CAPTCHA",
+            "email confirm"
+          ],
+          "minutes": 3,
+          "steps": [
+            "Search for your record",
+            "Click 'Opt Out' next to your name",
+            "Enter your email and confirm via the link"
+          ],
+          "notes": "Opt-out applies to search results only.",
+          "recheck_days": 90,
+          "verified": null,
+          "status": "blocked"
+        },
+        {
+          "id": "mylife",
+          "name": "MyLife",
+          "optout_url": "https://www.mylife.com/ccpa/index.pubview",
+          "requires": [
+            "account"
+          ],
+          "minutes": 6,
+          "steps": [
+            "Create an account or sign in",
+            "Find your profile and choose the removal option",
+            "Confirm the email they send you"
+          ],
+          "notes": "Often re-lists after a few months. Re-check quarterly.",
+          "recheck_days": 60,
+          "verified": null,
+          "status": "blocked"
+        },
+        {
+          "id": "peoplefinders",
+          "name": "PeopleFinders",
+          "optout_url": "https://www.peoplefinders.com/opt-out",
+          "requires": [
+            "CAPTCHA",
+            "support ticket"
+          ],
+          "minutes": 5,
+          "steps": [
+            "Open the opt-out form",
+            "Enter the URL of your listing",
+            "Submit and keep the ticket number"
+          ],
+          "notes": "Returns as a support ticket; keep the number in the notes field.",
+          "recheck_days": 90,
+          "verified": null,
+          "status": "blocked"
+        },
+        {
+          "id": "fastpeoplesearch",
+          "name": "FastPeopleSearch",
+          "optout_url": "https://www.fastpeoplesearch.com/removal",
+          "requires": [
+            "CAPTCHA",
+            "email confirm"
+          ],
+          "minutes": 3,
+          "steps": [
+            "Find your record",
+            "Click 'Remove My Record'",
+            "Confirm the email link"
+          ],
+          "notes": "Usually removed within 72 hours.",
+          "recheck_days": 90,
+          "verified": null,
+          "status": "blocked"
+        },
+        {
+          "id": "radaris",
+          "name": "Radaris",
+          "optout_url": "https://radaris.com/control/privacy",
+          "requires": [
+            "account",
+            "email confirm"
+          ],
+          "minutes": 6,
+          "steps": [
+            "Create an account",
+            "Find your profile and choose 'Remove'",
+            "Confirm from your email"
+          ],
+          "notes": "Account creation is unavoidable here.",
+          "recheck_days": 90,
+          "verified": "2026-11-12",
+          "status": "ok"
+        },
+        {
+          "id": "acxiom",
+          "name": "Acxiom",
+          "optout_url": "https://www.acxiom.com/optout/",
+          "requires": [
+            "CAPTCHA",
+            "email confirm"
+          ],
+          "minutes": 4,
+          "steps": [
+            "Choose 'Suppress my information'",
+            "Fill in your name and address",
+            "Confirm the email link"
+          ],
+          "notes": "A major upstream supplier, so worth doing even if you never see them directly.",
+          "recheck_days": 180,
+          "verified": "2026-11-12",
+          "status": "ok"
+        },
+        {
+          "id": "lexisnexis",
+          "name": "LexisNexis",
+          "optout_url": "https://optout.lexisnexis.com/",
+          "requires": [
+            "ID check"
+          ],
+          "minutes": 15,
+          "steps": [
+            "Start the suppression request",
+            "Enter your details and pick the products to suppress",
+            "Upload ID if they ask for it"
+          ],
+          "notes": "The heaviest form on this list. Do it when you have ID to hand.",
+          "recheck_days": 365,
+          "verified": "2026-11-12",
+          "status": "ok"
+        }
+      ]
+    },
+    "UK": {
+      "label": "United Kingdom",
+      "law": "UK GDPR Article 17 (right to erasure)",
+      "brokers": [
+        {
+          "id": "192com",
+          "name": "192.com",
+          "optout_url": "https://www.192.com/removals/",
+          "requires": [
+            "email confirm"
+          ],
+          "minutes": 4,
+          "steps": [
+            "Search for your listing",
+            "Open it and choose 'Remove this record'",
+            "Confirm the email link"
+          ],
+          "notes": "Covers the electoral-roll and phone directory listings.",
+          "recheck_days": 180,
+          "verified": null,
+          "status": "blocked"
+        },
+        {
+          "id": "experian-uk",
+          "name": "Experian UK",
+          "optout_url": "https://www.experian.co.uk/consumer/privacy.html",
+          "requires": [
+            "form"
+          ],
+          "minutes": 8,
+          "steps": [
+            "Choose the data or marketing complaint route",
+            "State that you are exercising your UK GDPR Article 17 right",
+            "Submit and keep their reference"
+          ],
+          "notes": "Credit-reference data is not the same as a marketing list, but they must still respond.",
+          "recheck_days": 180,
+          "verified": "2026-11-12",
+          "status": "ok"
+        },
+        {
+          "id": "equifax-uk",
+          "name": "Equifax UK",
+          "optout_url": "https://www.equifax.co.uk/contact-us/",
+          "requires": [
+            "form"
+          ],
+          "minutes": 8,
+          "steps": [
+            "Open the contact form",
+            "Ask for erasure under UK GDPR Article 17",
+            "Keep the acknowledgement"
+          ],
+          "notes": "Use the email template below if the form is unclear.",
+          "recheck_days": 180,
+          "verified": "2026-11-12",
+          "status": "ok"
+        },
+        {
+          "id": "transunion-uk",
+          "name": "TransUnion UK",
+          "optout_url": "https://www.transunion.co.uk/contact-us",
+          "requires": [
+            "form"
+          ],
+          "minutes": 8,
+          "steps": [
+            "Open the contact page",
+            "Request erasure under UK GDPR Article 17",
+            "Keep the reference number"
+          ],
+          "notes": "",
+          "recheck_days": 180,
+          "verified": null,
+          "status": "blocked"
+        },
+        {
+          "id": "ukphonebook",
+          "name": "UKPhoneBook",
+          "optout_url": "https://www.ukphonebook.com/",
+          "requires": [
+            "email"
+          ],
+          "minutes": 5,
+          "steps": [
+            "Search for your entry",
+            "Use their contact form to ask for removal",
+            "Confirm by email"
+          ],
+          "notes": "Small directory; a short email with the template is enough.",
+          "recheck_days": 180,
+          "verified": "2026-11-12",
+          "status": "ok"
+        },
+        {
+          "id": "ico",
+          "name": "ICO guidance (escalation)",
+          "optout_url": "https://ico.org.uk/for-the-public/your-right-to-get-your-data-deleted/",
+          "requires": [],
+          "minutes": 2,
+          "steps": [
+            "Read the one-page summary",
+            "If a company ignores you, use their complaint route"
+          ],
+          "notes": "Not a broker. This is where you escalate a refusal.",
+          "recheck_days": 0,
+          "verified": "2026-11-12",
+          "status": "ok"
+        }
+      ]
+    },
+    "EU": {
+      "label": "European Union",
+      "law": "GDPR Article 17 (right to erasure)",
+      "brokers": [
+        {
+          "id": "dastelefonbuch",
+          "name": "Das Telefonbuch (DE)",
+          "optout_url": "https://www.dastelefonbuch.de/Service/Kontakt",
+          "requires": [
+            "email"
+          ],
+          "minutes": 6,
+          "steps": [
+            "Open the contact form",
+            "Ask for deletion of your directory entry",
+            "Quote GDPR Article 17"
+          ],
+          "notes": "For phone-book entries, not marketing data.",
+          "recheck_days": 180,
+          "verified": null,
+          "status": "blocked"
+        },
+        {
+          "id": "pagesjaunes",
+          "name": "PagesJaunes (FR)",
+          "optout_url": "https://www.pagesjaunes.fr/",
+          "requires": [
+            "form"
+          ],
+          "minutes": 6,
+          "steps": [
+            "Search for your listing",
+            "Use the 'signaler' / contact option on the listing",
+            "Ask for removal under GDPR Article 17"
+          ],
+          "notes": "",
+          "recheck_days": 180,
+          "verified": null,
+          "status": "blocked"
+        },
+        {
+          "id": "paginebianche",
+          "name": "PagineBianche (IT)",
+          "optout_url": "https://www.paginebianche.it/",
+          "requires": [
+            "email"
+          ],
+          "minutes": 6,
+          "steps": [
+            "Find your entry",
+            "Use the contact form to request cancellation",
+            "Quote GDPR Article 17"
+          ],
+          "notes": "",
+          "recheck_days": 180,
+          "verified": null,
+          "status": "unverified"
+        },
+        {
+          "id": "telefoonboek",
+          "name": "Telefoonboek (NL)",
+          "optout_url": "https://www.telefoonboek.nl/",
+          "requires": [
+            "email"
+          ],
+          "minutes": 6,
+          "steps": [
+            "Find your listing",
+            "Request removal through their contact form",
+            "Confirm by email"
+          ],
+          "notes": "",
+          "recheck_days": 180,
+          "verified": "2026-11-12",
+          "status": "ok"
+        },
+        {
+          "id": "11880",
+          "name": "11880 (DE)",
+          "optout_url": "https://www.11880.com/kontakt",
+          "requires": [
+            "email"
+          ],
+          "minutes": 6,
+          "steps": [
+            "Open the contact form",
+            "Ask for removal of your entry",
+            "Quote GDPR Article 17"
+          ],
+          "notes": "",
+          "recheck_days": 180,
+          "verified": null,
+          "status": "blocked"
+        },
+        {
+          "id": "hitta",
+          "name": "Hitta.se (SE)",
+          "optout_url": "https://www.hitta.se/",
+          "requires": [
+            "form"
+          ],
+          "minutes": 6,
+          "steps": [
+            "Find your profile",
+            "Use the removal link on the profile",
+            "Confirm by email"
+          ],
+          "notes": "",
+          "recheck_days": 180,
+          "verified": "2026-11-12",
+          "status": "ok"
+        },
+        {
+          "id": "krak",
+          "name": "Krak.dk (DK)",
+          "optout_url": "https://www.krak.dk/kundeservice",
+          "requires": [
+            "email"
+          ],
+          "minutes": 6,
+          "steps": [
+            "Open customer service",
+            "Ask for deletion of your directory entry",
+            "Quote GDPR Article 17"
+          ],
+          "notes": "",
+          "recheck_days": 180,
+          "verified": null,
+          "status": "blocked"
+        },
+        {
+          "id": "edpb",
+          "name": "EDPB guidance (escalation)",
+          "optout_url": "https://www.edpb.europa.eu/",
+          "requires": [],
+          "minutes": 2,
+          "steps": [
+            "Find your national data protection authority",
+            "Use their complaint form if a company refuses"
+          ],
+          "notes": "Not a broker. Escalation route only.",
+          "recheck_days": 0,
+          "verified": "2026-11-12",
+          "status": "ok"
+        }
+      ]
+    },
+    "CA": {
+      "label": "Canada",
+      "law": "PIPEDA (withdrawal of consent and correction rights)",
+      "brokers": [
+        {
+          "id": "canada411",
+          "name": "Canada411",
+          "optout_url": "https://www.canada411.ca/",
+          "requires": [
+            "email"
+          ],
+          "minutes": 6,
+          "steps": [
+            "Find your listing",
+            "Use the contact form to request removal",
+            "Confirm by email"
+          ],
+          "notes": "",
+          "recheck_days": 180,
+          "verified": "2026-11-12",
+          "status": "ok"
+        },
+        {
+          "id": "yellowpages-ca",
+          "name": "YellowPages.ca",
+          "optout_url": "https://www.yellowpages.ca/",
+          "requires": [
+            "form"
+          ],
+          "minutes": 6,
+          "steps": [
+            "Open the privacy page",
+            "Follow their data-removal route",
+            "Quote PIPEDA"
+          ],
+          "notes": "",
+          "recheck_days": 180,
+          "verified": "2026-11-12",
+          "status": "ok"
+        },
+        {
+          "id": "411ca",
+          "name": "411.ca",
+          "optout_url": "https://www.411.ca/",
+          "requires": [
+            "email"
+          ],
+          "minutes": 6,
+          "steps": [
+            "Search your listing",
+            "Use their contact form to request removal",
+            "Confirm by email"
+          ],
+          "notes": "",
+          "recheck_days": 180,
+          "verified": "2026-11-12",
+          "status": "ok"
+        },
+        {
+          "id": "infobel-ca",
+          "name": "Infobel",
+          "optout_url": "https://www.infobel.com/en/worldwide/ContactUs",
+          "requires": [
+            "email"
+          ],
+          "minutes": 6,
+          "steps": [
+            "Open the contact page",
+            "Ask for removal of your directory listing",
+            "Confirm by email"
+          ],
+          "notes": "International aggregator; removal covers several directories at once.",
+          "recheck_days": 180,
+          "verified": null,
+          "status": "blocked"
+        },
+        {
+          "id": "opc",
+          "name": "Privacy Commissioner guidance (escalation)",
+          "optout_url": "https://www.priv.gc.ca/en/privacy-topics/your-privacy-rights/",
+          "requires": [],
+          "minutes": 2,
+          "steps": [
+            "Read your rights",
+            "File a complaint if a company refuses"
+          ],
+          "notes": "Not a broker. Escalation route only.",
+          "recheck_days": 0,
+          "verified": "2026-11-12",
+          "status": "ok"
+        }
+      ]
+    },
+    "AU": {
+      "label": "Australia",
+      "law": "Privacy Act 1988 (Cth) and the Australian Privacy Principles",
+      "brokers": [
+        {
+          "id": "whitepages-au",
+          "name": "White Pages (AU)",
+          "optout_url": "https://www.whitepages.com.au/",
+          "requires": [
+            "email"
+          ],
+          "minutes": 6,
+          "steps": [
+            "Find your listing",
+            "Use the contact form to request removal",
+            "Confirm by email"
+          ],
+          "notes": "",
+          "recheck_days": 180,
+          "verified": null,
+          "status": "blocked"
+        },
+        {
+          "id": "yellowpages-au",
+          "name": "Yellow Pages (AU)",
+          "optout_url": "https://www.yellowpages.com.au/contact-us",
+          "requires": [
+            "form"
+          ],
+          "minutes": 6,
+          "steps": [
+            "Open the contact page",
+            "Request removal of your listing",
+            "Quote the Australian Privacy Principles"
+          ],
+          "notes": "",
+          "recheck_days": 180,
+          "verified": null,
+          "status": "blocked"
+        },
+        {
+          "id": "reverseaustralia",
+          "name": "Reverse Australia",
+          "optout_url": "https://www.reverseaustralia.com/",
+          "requires": [
+            "email"
+          ],
+          "minutes": 6,
+          "steps": [
+            "Search for your number",
+            "Follow their removal request link",
+            "Confirm by email"
+          ],
+          "notes": "",
+          "recheck_days": 90,
+          "verified": "2026-11-12",
+          "status": "ok"
+        },
+        {
+          "id": "personlookup",
+          "name": "Person Lookup (AU)",
+          "optout_url": "https://personlookup.com.au/",
+          "requires": [
+            "email"
+          ],
+          "minutes": 6,
+          "steps": [
+            "Find your record",
+            "Use the contact form to request removal",
+            "Confirm by email"
+          ],
+          "notes": "",
+          "recheck_days": 90,
+          "verified": null,
+          "status": "blocked"
+        },
+        {
+          "id": "infobel-au",
+          "name": "Infobel",
+          "optout_url": "https://www.infobel.com/en/worldwide/ContactUs",
+          "requires": [
+            "email"
+          ],
+          "minutes": 6,
+          "steps": [
+            "Open the contact page",
+            "Ask for removal of your directory listing",
+            "Confirm by email"
+          ],
+          "notes": "",
+          "recheck_days": 180,
+          "verified": null,
+          "status": "blocked"
+        },
+        {
+          "id": "oaic",
+          "name": "OAIC guidance (escalation)",
+          "optout_url": "https://www.oaic.gov.au/privacy/your-privacy-rights/",
+          "requires": [],
+          "minutes": 2,
+          "steps": [
+            "Read your rights",
+            "Use their complaint route if a company refuses"
+          ],
+          "notes": "Not a broker. Escalation route only.",
+          "recheck_days": 0,
+          "verified": null,
+          "status": "blocked"
+        }
+      ]
+    }
+  }
+}

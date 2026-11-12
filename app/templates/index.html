@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}Glasshouse — check your own footprint{% endblock %}
+{% block content %}
+<h1>See what a stranger can find about you.</h1>
+<p class="lede">
+  Type in <strong>your own</strong> details. Glasshouse checks public profiles, breach guidance and
+  search results, then hands you a cleanup list. Nothing is stored after your session.
+</p>
+
+{% if wiped %}
+  <div class="notice good">Your results have been deleted from memory. Nothing about that scan remains.</div>
+{% endif %}
+
+{% if error == 'consent' %}
+  <div class="notice bad">You need to confirm this scan is about you before we start.</div>
+{% elif error == 'username' %}
+  <div class="notice bad">That username has characters we don't accept. Use letters, numbers, dots, dashes and underscores only.</div>
+{% elif error == 'email' %}
+  <div class="notice bad">One of those emails doesn't look right. Separate multiple emails with commas or spaces.</div>
+{% elif error == 'empty' %}
+  <div class="notice bad">Give us at least a username or an email address.</div>
+{% elif error == 'rate' %}
+  <div class="notice warn">You've already run a scan recently. Try again in about {{ wait or cooldown }} seconds.</div>
+{% elif error == 'busy' %}
+  <div class="notice warn">The tool is at capacity right now. Wait a minute and try again.</div>
+{% elif error == 'expired' %}
+  <div class="notice warn">That scan expired. Results are wiped after {{ (settings.job_ttl_seconds // 60) }} minutes, so start a new one.</div>
+{% elif error == 'import' %}
+  <div class="notice bad">That file wasn't a Glasshouse plan. Use the <code>.json</code> file from the “Download my plan” button.</div>
+{% endif %}
+
+<form method="post" action="/scan" class="panel" autocomplete="off">
+  <label class="field">
+    <span class="name">Your main username</span>
+    <span class="hint">The handle you use in most places — no @ symbol. This is the most useful field.</span>
+    <input type="text" name="username" placeholder="e.g. gingerveeb" maxlength="64" autocomplete="off">
+  </label>
+
+  <label class="field">
+    <span class="name">Your email address(es)</span>
+    <span class="hint">Up to 3, separated by commas. Used for a Gravatar check and for breach guidance.</span>
+    <textarea name="emails" placeholder="you@example.com, old-email@example.com" autocomplete="off"></textarea>
+  </label>
+
+  <div class="row">
+    <label class="field">
+      <span class="name">Your full name <span class="small">(optional)</span></span>
+      <span class="hint">Only used to build search links. We never send it to a third party.</span>
+      <input type="text" name="name" placeholder="Alex Smith" maxlength="80" autocomplete="off">
+    </label>
+    <label class="field">
+      <span class="name">Your town or city <span class="small">(optional)</span></span>
+      <span class="hint">Makes name searches much more accurate.</span>
+      <input type="text" name="city" placeholder="Manchester" maxlength="80" autocomplete="off">
+    </label>
+  </div>
+
+  <div class="field">
+    <span class="name">Where do you live?</span>
+    <span class="hint">Picks the right data-broker opt-out list and legal wording. Choose all that apply.</span>
+    <div class="checks">
+      {% for code, label in regions %}
+        <label><input type="checkbox" name="regions" value="{{ code }}" {% if code == 'US' %}checked{% endif %}> {{ label }}</label>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="consent">
+    <input type="checkbox" name="consent" value="yes" id="consent" required>
+    <label for="consent">
+      This is my own information, and I have the right to check it. I won't use this on someone else.
+    </label>
+  </div>
+
+  <div class="toolbar">
+    <button type="submit">Check my footprint</button>
+    <span class="small">Usually takes 20–60 seconds.</span>
+  </div>
+</form>
+
+<div class="notice">
+  <strong>What this does:</strong> checks ~45 public sites for your username, looks up Gravatar for your
+  email, and prepares exact search queries and data-broker removal links for you.<br>
+  <strong>On the report you get:</strong> a guided removal queue that opens each broker's exact opt-out
+  page and shows the three clicks that follow, with a tracker and calendar reminders.<br>
+  <strong>What it can't do:</strong> see private accounts, read your direct messages, query breach
+  databases automatically (that needs a paid key), or delete anything for you. Sites like X, Instagram
+  and TikTok block automated lookups, so those are offered as links you click yourself.
+</div>
+
+<div class="panel">
+  <h3 style="margin-top:0">Coming back to a cleanup?</h3>
+  <p class="small">
+    Results are wiped after {{ (settings.job_ttl_seconds // 60) }} minutes, but the report has a
+    <strong>Download my plan (.json)</strong> button. Load that file here to get your ticks, notes and
+    follow-up dates back.
+  </p>
+  <form method="post" action="/plan/import" enctype="multipart/form-data" class="toolbar">
+    <input type="file" name="file" accept="application/json,.json" required>
+    <button type="submit">Load my saved plan</button>
+  </form>
+</div>
+
+<div class="notice warn">
+  <strong>Open link, shared host.</strong> This tool is public, so treat everything it shows as
+  reproducible by anyone. That's the point: fix what it finds. Results live in memory for
+  {{ (settings.job_ttl_seconds // 60) }} minutes and are wiped on request.
+</div>
+{% endblock %}

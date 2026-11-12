@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Privacy — Glasshouse{% endblock %}
+{% block content %}
+<h1>Privacy</h1>
+<p class="lede">Short version: we keep nothing. Here is the longer version.</p>
+
+<div class="panel">
+  <h2 style="margin-top:0">What happens to what you type</h2>
+  <ul>
+    <li>Your input is held in the server's memory for this scan only.</li>
+    <li>Results are wiped when you press <em>Delete my results now</em>, when the session expires
+      ({{ (settings.job_ttl_seconds // 60) }} minutes), or when the server restarts.</li>
+    <li>There is no database, no analytics script, and no third-party tracking.</li>
+    <li>We never send your name or city anywhere. They are only used to build search links in your browser.</li>
+  </ul>
+
+  <h2>What leaves this server</h2>
+  <ul>
+    <li>Your <strong>username</strong> is sent to the public profile URLs being checked (that's how any username lookup works).</li>
+    <li>Your <strong>email</strong> is hashed and the hash is sent to Gravatar to see whether a public profile exists.</li>
+    <li>Nothing else leaves. Breach checks are links you click yourself.</li>
+  </ul>
+
+  <h2>What the host can see</h2>
+  <p>
+    This runs on a free hosting platform, so the platform sees network-level data such as your IP address
+    and the pages you request. That is true of any website. Use a VPN if that matters to you.
+  </p>
+
+  <h2>What this tool will not do</h2>
+  <ul>
+    <li>Query breach databases or sell you results.</li>
+    <li>Scrape search engines, bypass logins, or probe password-reset endpoints.</li>
+    <li>Delete accounts for you — every deletion must be done by the account owner, logged in.</li>
+    <li>Check anyone but the person who consented on the form.</li>
+  </ul>
+
+  <h2>One honest warning</h2>
+  <p>
+    This is a public link. Anything it can reveal about you, someone else could reveal with the same free tools.
+    That is not a reason to avoid it — it's the reason to fix what it finds.
+  </p>
+</div>
+
+<p><a class="btn" href="/">Back to the scan</a></p>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Checking… — Glasshouse{% endblock %}
+{% block content %}
+{% if job.status == 'done' %}
+  <meta http-equiv="refresh" content="0;url=/scan/{{ job.id }}/report">
+{% elif job.status == 'error' %}
+  <meta http-equiv="refresh" content="0;url=/scan/{{ job.id }}/report">
+{% else %}
+  <meta http-equiv="refresh" content="2">
+{% endif %}
+
+<div class="progress-wrap">
+  <h1>Checking your footprint</h1>
+  <p class="lede">{{ job.stage }}…</p>
+  {% set pct = (100 * job.done / job.total) | round | int if job.total else 0 %}
+  <div class="bar"><span style="width: {{ pct }}%"></span></div>
+  <p class="small">{{ job.done }} of {{ job.total }} checks done</p>
+  {% if job.status == 'done' %}
+    <p>Done. <a href="/scan/{{ job.id }}/report">Open your report</a>.</p>
+  {% elif job.status == 'error' %}
+    <p>Something went wrong. <a href="/scan/{{ job.id }}/report">See what happened</a>.</p>
+  {% else %}
+    <p class="small">This page refreshes itself. Keep it open.</p>
+  {% endif %}
+  <p class="small">
+    {% if job.profile.username %}Username: <code>{{ job.profile.username }}</code>{% endif %}
+    {% if job.profile.emails %} · Emails: {{ job.profile.emails | length }}{% endif %}
+  </p>
+</div>
+{% endblock %}

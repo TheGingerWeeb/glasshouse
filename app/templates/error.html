@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Scan failed — Glasshouse{% endblock %}
+{% block content %}
+<h1>That scan didn't finish</h1>
+<p class="lede">Something broke while checking the sites. The details are below so it can be fixed.</p>
+<div class="notice bad">
+  <code>{{ job.error or 'Unknown error' }}</code>
+</div>
+<p class="small">
+  This is usually a network hiccup or a site rate-limiting the shared host. Try again in a minute.
+</p>
+<p><a class="btn" href="/">Start a new scan</a></p>
+{% endblock %}
