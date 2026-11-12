@@ -15,3 +15,5 @@ services:
         value: "5"
       - key: GLASSHOUSE_CONCURRENCY
         value: "10"
+      - key: GLASSHOUSE_MAX_SITES
+        value: "160"

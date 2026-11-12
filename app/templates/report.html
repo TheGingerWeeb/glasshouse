@@ -283,30 +283,44 @@
   </div>
 {% endif %}
 
-{% if summary.links %}
+{% if summary.link_groups %}
   <h2>Search for mentions of you</h2>
   <div class="panel">
     <p class="small" style="margin-top:0">
-      Run these yourself. They're plain search queries — no engine is scraped on your behalf.
+      Run these yourself. They're pre-filled searches and links — no engine is scraped on your behalf.
+      Start with <strong>Username</strong> and <strong>Email</strong>; the rest is worth doing once.
     </p>
-    <table class="links">
-      <thead>
-        <tr><th>What it finds</th><th>Query</th><th>Run it</th></tr>
-      </thead>
-      <tbody>
-        {% for row in summary.links %}
-          <tr>
-            <td><strong>{{ row.label }}</strong><br><span class="small">{{ row.note }}</span></td>
-            <td><code>{{ row.query }}</code></td>
-            <td class="small">
-              <a href="{{ row.google }}" target="_blank" rel="noopener noreferrer nofollow">Google</a> ·
-              <a href="{{ row.bing }}" target="_blank" rel="noopener noreferrer nofollow">Bing</a> ·
-              <a href="{{ row.ddg }}" target="_blank" rel="noopener noreferrer nofollow">DuckDuckGo</a>
-            </td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+    {% for group in summary.link_groups %}
+      <h3>{{ group.label }}</h3>
+      <table class="links">
+        <thead>
+          <tr><th>What it finds</th><th>Query</th><th>Run it</th></tr>
+        </thead>
+        <tbody>
+          {% for row in group.rows %}
+            <tr>
+              <td><strong>{{ row.label }}</strong><br><span class="small">{{ row.note }}</span></td>
+              <td>
+                {% if row.kind == 'direct' %}
+                  <span class="small">Opens the site directly</span>
+                {% else %}
+                  <code>{{ row.query }}</code>
+                {% endif %}
+              </td>
+              <td class="small">
+                {% if row.kind == 'direct' %}
+                  <a href="{{ row.url }}" target="_blank" rel="noopener noreferrer nofollow">Open</a>
+                {% else %}
+                  <a href="{{ row.google }}" target="_blank" rel="noopener noreferrer nofollow">Google</a> ·
+                  <a href="{{ row.bing }}" target="_blank" rel="noopener noreferrer nofollow">Bing</a> ·
+                  <a href="{{ row.ddg }}" target="_blank" rel="noopener noreferrer nofollow">DuckDuckGo</a>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endfor %}
   </div>
 {% endif %}
 

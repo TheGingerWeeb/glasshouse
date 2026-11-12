@@ -12,9 +12,26 @@ email, and gets back:
   exact opt-out page, the clicks that follow, copy buttons for your details, a status tracker and
   calendar reminders,
 - statutorily-worded removal emails per region,
-- ready-made search queries for finding mentions of their name.
+- ready-made searches for mentions of their name, username and email, plus image, archive, code and
+  breach-check links.
 
 It is built for teaching opsec: run it, fix what it finds, run it again.
+
+---
+
+## What gets checked
+
+- **~110 automated profile probes** across developer sites, social platforms, creative portfolios,
+  gaming, professional profiles, marketplaces, forums and a few regional communities.
+- **~40 manual self-check links** for sites that block automation or need an ID you would have to
+  paste — X, Instagram, TikTok, Facebook, LinkedIn, Threads, marketplaces, fitness apps, payment
+  handles and more.
+- **~40 prepared searches**, grouped into username, name, email, code/pastes, images, archives and
+  breach checks. You run them yourself; nothing is scraped.
+- **Gravatar** lookup for each email address.
+
+Some sites answer every request with a bot challenge. Those are reported as **blocked**, never as
+"no account".
 
 ---
 
@@ -26,8 +43,7 @@ It is built for teaching opsec: run it, fix what it finds, run it again.
 - No automatic account deletion. Every deletion has to be done by the owner, logged in.
 - No storage. Jobs live in memory and are wiped on request or after 10 minutes.
 
-Sites that block automation (X, Instagram, TikTok, Facebook, LinkedIn, Snapchat) are offered as
-self-check links rather than fake "not found" results.
+Sites that block automation are offered as self-check links rather than fake "not found" results.
 
 ---
 
@@ -152,7 +168,7 @@ If you prefer **New → Web Service** instead of a Blueprint, use:
 | `GLASSHOUSE_COOLDOWN` | `180` | Seconds between scans per IP |
 | `GLASSHOUSE_TTL` | `600` | Seconds a finished job stays in memory |
 | `GLASSHOUSE_MAX_SCANS` | `15` | Max simultaneous scans |
-| `GLASSHOUSE_MAX_SITES` | `120` | Site cap per scan |
+| `GLASSHOUSE_MAX_SITES` | `160` | Site cap per scan |
 | `GLASSHOUSE_CONCURRENCY` | `20` | Parallel outbound requests |
 | `GLASSHOUSE_UA` | `Glasshouse/1.0 ...` | User-Agent sent to checked sites |
 
@@ -185,6 +201,23 @@ Set these in Render under **Environment** (or edit `render.yaml`). Python is pin
 - `"subdomain": true` treats a DNS failure as "no account" (for `username.example.com` sites).
 - `"manual": true` skips probing and shows the profile URL as a self-check link.
 
+The live categories are `dev`, `social`, `creative`, `gaming`, `professional`, `marketplace`,
+`forums` and `regional`. Add a category to both `app/scanner/report.py` and `app/scanner/engine.py`
+if you introduce a new one.
+
+Before adding a site, prove it with the audit:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\audit_sites.py
+```
+
+It probes every automated site with a known username (`torvalds`) and a gibberish one
+(`zzqx8f3k9v0m2`). A site that reports "found" for the gibberish name must be marked `"soft": true`
+or removed. The command exits non-zero when a false positive is present.
+
+`scripts/inspect_probe.py SITE_ID` prints the raw status, title and visible text for both usernames,
+which is the quickest way to find a reliable `absent_marker`.
+
 Add the site's deletion/settings page under `deleteUrl` if you want an extra shortcut in the report.
 
 Broker data lives in `app/data/brokers.json`, grouped by `US`, `UK`, `EU`, `CA`, `AU`.
@@ -210,6 +243,9 @@ blocked sources are reported as blocked rather than as "not found".
 ```powershell
 # Offline: renders every template and asserts the report has content.
 .\.venv\Scripts\python.exe scripts\check.py
+
+# Quality gate: every automated probe against a known and a gibberish username.
+.\.venv\Scripts\python.exe scripts\audit_sites.py
 
 # Live: start the server in another shell with the cooldown off, then run the flow test.
 $env:GLASSHOUSE_COOLDOWN="0"

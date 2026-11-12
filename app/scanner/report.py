@@ -11,9 +11,22 @@ CATEGORY_LABELS = {
     "creative": "Creative",
     "gaming": "Gaming",
     "professional": "Professional & publishing",
+    "marketplace": "Marketplaces",
+    "forums": "Forums & link sites",
+    "regional": "Regional communities",
     "other": "Other",
 }
-CATEGORY_ORDER = ["dev", "social", "creative", "gaming", "professional", "other"]
+CATEGORY_ORDER = [
+    "dev",
+    "social",
+    "creative",
+    "gaming",
+    "professional",
+    "marketplace",
+    "forums",
+    "regional",
+    "other",
+]
 
 
 def _card(title: str, tone: str, label: str, why: str, fix: str) -> dict:
@@ -115,6 +128,17 @@ def build(job: Job) -> dict:
         )
 
     followups.sort(key=lambda item: item["date"])
+
+    link_groups = []
+    link_index: dict[str, dict] = {}
+    for row in job.links:
+        key = row.get("group", "Search")
+        group = link_index.get(key)
+        if group is None:
+            group = {"key": key, "label": key, "rows": []}
+            link_index[key] = group
+            link_groups.append(group)
+        group["rows"].append(row)
 
     account_items = [
         {
@@ -236,6 +260,7 @@ def build(job: Job) -> dict:
         "followups": followups,
         "manual": job.manual,
         "links": job.links,
+        "link_groups": link_groups,
         "emails": job.emails,
         "ambiguous": ambiguous,
         "blocked": blocked,

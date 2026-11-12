@@ -20,7 +20,7 @@ class Settings:
     # Global ceiling on simultaneous scans across all visitors.
     max_concurrent_scans: int = _int("GLASSHOUSE_MAX_SCANS", 15)
     # How many sites one scan may probe.
-    max_sites: int = _int("GLASSHOUSE_MAX_SITES", 120)
+    max_sites: int = _int("GLASSHOUSE_MAX_SITES", 160)
     # Parallel outbound requests per scan.
     per_site_concurrency: int = _int("GLASSHOUSE_CONCURRENCY", 20)
     # Per-site timeout in seconds.
