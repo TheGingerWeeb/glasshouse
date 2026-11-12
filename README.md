@@ -253,6 +253,12 @@ $env:GLASSHOUSE_COOLDOWN="0"
 .\.venv\Scripts\python.exe scripts\e2e.py torvalds
 ```
 
+`e2e.py` accepts a second argument to run the same flow against a deployed instance:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\e2e.py torvalds https://YOUR-SERVICE.onrender.com
+```
+
 `e2e.py` checks scan → report → broker status → calendar → export/import → tracker → region switch
 → wipe. `scripts/probe_urls.py URL...` prints status, redirect target and title for any link you
 are considering adding.

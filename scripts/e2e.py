@@ -1,4 +1,4 @@
-"""End-to-end HTTP check against a locally running Glasshouse.
+"""End-to-end HTTP check against a running Glasshouse.
 
     .\\.venv\\Scripts\\python.exe -m uvicorn app.main:app --port 8000
     .\\.venv\\Scripts\\python.exe scripts\\e2e.py torvalds
@@ -13,13 +13,14 @@ import time
 
 import httpx
 
-BASE = "http://127.0.0.1:8000"
+DEFAULT_BASE = "http://127.0.0.1:8000"
 
 
 def main() -> int:
     username = sys.argv[1] if len(sys.argv) > 1 else "torvalds"
+    base = sys.argv[2] if len(sys.argv) > 2 else DEFAULT_BASE
 
-    with httpx.Client(base_url=BASE, follow_redirects=False, timeout=30) as client:
+    with httpx.Client(base_url=base, follow_redirects=False, timeout=60) as client:
         home = client.get("/")
         assert home.status_code == 200, home.status_code
         assert "Load my saved plan" in home.text
@@ -40,10 +41,14 @@ def main() -> int:
         location = started.headers["location"]
         print("job started:", location)
 
-        deadline = time.time() + 150
+        deadline = time.time() + 240
         while time.time() < deadline:
             page = client.get(location)
-            if page.status_code == 200 and "progress-wrap" in page.text:
+            if (
+                page.status_code == 200
+                and "progress-wrap" in page.text
+                and "Open your report" not in page.text
+            ):
                 time.sleep(2)
                 continue
             break
